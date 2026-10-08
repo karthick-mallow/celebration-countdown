@@ -137,3 +137,24 @@ body:not(.stage) #exitStage { display: none; }
   #exitStage { transition: none; }
 }
 .nowrap { white-space: nowrap; }
+
+/* Occasion grid */
+.occasions { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 10px; }
+.occasions legend { font-size: 13px; color: var(--muted); padding: 0; margin-bottom: 10px; }
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tile { position: relative; display: block; cursor: pointer; min-width: 0; }
+.tile input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.tile span {
+  display: grid; justify-items: center; gap: 8px; text-align: center;
+  padding-block: 16px 14px; padding-inline: 8px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--night);
+  color: var(--muted); font: 500 13px/1.25 var(--font-body);
+  transition: border-color .15s, background .15s, color .15s;
+}
+.tile svg { width: 30px; height: 30px; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.tile:hover span { border-color: var(--muted); color: var(--ink); }
+.tile input:checked + span { border-color: var(--gold); background: var(--panel); color: var(--ink); }
+.tile input:checked + span svg { stroke: var(--gold); }
+.tile input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (max-width: 400px) { .tile span { padding-block: 12px 10px; font-size: 12px; } .tile svg { width: 26px; height: 26px; } }
+@media (prefers-reduced-motion: reduce) { .tile span { transition: none; } }

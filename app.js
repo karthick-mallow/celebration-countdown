@@ -58,6 +58,7 @@
   const titled = (nm, noun) => nm ? [nm, ''] : ['Your', noun];
   const OCCASIONS = {
     birthday: {
+      icon: "<path d='M4 21h16M5 21v-7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7M5 16.5c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0M12 12V9'/><path d='M12 9c-1 0-1.6-.8-1.6-1.7C10.4 6 12 4 12 4s1.6 2 1.6 3.3c0 .9-.6 1.7-1.6 1.7z'/>",
       label: 'Birthday', recurs: 'yearly',
       name: { label: 'Name', placeholder: 'e.g. Aarav', required: true },
       date: { label: 'Date of birth', when: 'past', sample: [30, 30] },
@@ -67,6 +68,7 @@
       cheerSub: n => n ? `Happy ${ord(n)}! The clock struck midnight.` : 'The clock struck midnight.'
     },
     anniversary: {
+      icon: "<path d='M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z'/>",
       label: 'Anniversary', recurs: 'yearly',
       name: { label: 'Couple', placeholder: 'e.g. Priya & Arjun', required: true },
       date: { label: 'Wedding date', when: 'past', sample: [10, 30] },
@@ -76,6 +78,7 @@
       cheerSub: n => n ? `${n} ${n === 1 ? 'year' : 'years'} together.` : 'The clock struck midnight.'
     },
     wedding: {
+      icon: "<circle cx='9' cy='14.5' r='5'/><circle cx='15' cy='14.5' r='5'/><path d='M13.3 5.5h3.4l1 1.4L15 9.5l-2.7-2.6z'/>",
       label: 'Wedding day', recurs: 'once',
       name: { label: 'Couple', placeholder: 'e.g. Priya & Arjun', required: true },
       date: { label: 'Wedding date', when: 'future', sample: [0, 45] },
@@ -85,6 +88,7 @@
       cheerSub: () => 'The wedding day is here.'
     },
     newyear: {
+      icon: "<path d='M12 3v3.5M12 17.5V21M3 12h3.5M17.5 12H21M5.6 5.6l2.5 2.5M15.9 15.9l2.5 2.5M5.6 18.4l2.5-2.5M15.9 8.1l2.5-2.5'/><circle cx='12' cy='12' r='1.6'/>",
       label: 'New Year', recurs: 'yearly', fixed: '01-01',
       name: { label: 'From (optional)', placeholder: 'e.g. The Sharma family', required: false },
       count: null,
@@ -93,6 +97,7 @@
       cheerSub: (n, nm) => nm ? `With love from ${nm}.` : 'The clock struck midnight.'
     },
     festival: {
+      icon: "<path d='M3 14.5c0 2.8 4 4.5 9 4.5s9-1.7 9-4.5H3zM9 21.5h6'/><path d='M12 11.5c-1.3 0-2-1-2-2.2C10 7.6 12 5 12 5s2 2.6 2 4.3c0 1.2-.7 2.2-2 2.2z'/>",
       label: 'Festival', recurs: 'once',
       name: { label: 'Festival', placeholder: 'e.g. Diwali, Eid, Christmas, Pongal', required: true },
       date: { label: 'Festival date', when: 'future', sample: [0, 30] },
@@ -102,6 +107,7 @@
       cheerSub: () => 'Let the celebrations begin.'
     },
     baby: {
+      icon: "<path d='M5 4.5a7.5 7.5 0 0 1 7.5 7.5H5zM12.5 12H19M5 12a7 4.2 0 0 0 14 0M2.5 4.5H5'/><circle cx='8' cy='19.5' r='1.6'/><circle cx='16' cy='19.5' r='1.6'/>",
       label: 'Baby arrival', recurs: 'once',
       name: { label: 'Family or baby name', placeholder: 'e.g. Baby Iyer', required: true },
       date: { label: 'Due date', when: 'future', sample: [0, 60] },
@@ -111,6 +117,7 @@
       cheerSub: (n, nm) => nm ? `${nm}'s due date is here.` : 'The due date is here.'
     },
     graduation: {
+      icon: "<path d='M2 9.5l10-5 10 5-10 5zM6 11.5v4.8c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.8M22 9.5v5.5'/>",
       label: 'Graduation', recurs: 'once',
       name: { label: 'Graduate', placeholder: 'e.g. Meera', required: true },
       date: { label: 'Graduation day', when: 'future', sample: [0, 40] },
@@ -120,6 +127,7 @@
       cheerSub: () => 'Graduation day is here.'
     },
     retirement: {
+      icon: "<path d='M3 18h18M6.5 18a5.5 5.5 0 0 1 11 0M12 7V4.5M6.3 10.3 4.6 8.6M17.7 10.3l1.7-1.7M8 21.5h8'/>",
       label: 'Retirement', recurs: 'once',
       name: { label: 'Name', placeholder: 'e.g. Ravi', required: true },
       date: { label: 'Retirement day', when: 'future', sample: [0, 50] },
@@ -129,6 +137,7 @@
       cheerSub: () => 'The next chapter starts now.'
     },
     event: {
+      icon: "<rect x='3.5' y='5' width='17' height='15.5' rx='2'/><path d='M3.5 10h17M8 3v4M16 3v4M12 12.5l1.1 2.2 2.4.4-1.75 1.7.4 2.4-2.15-1.15-2.15 1.15.4-2.4-1.75-1.7 2.4-.4z'/>",
       label: 'Custom event', recurs: 'once',
       name: { label: 'Event name', placeholder: 'e.g. Housewarming, Product launch', required: true },
       date: { label: 'Event date', when: 'future', sample: [0, 21] },
@@ -340,13 +349,15 @@
     }
     sel.appendChild(frag);
   }
-  function fillOccSelect() {
+  const getOcc = () => occOf(($('setup').querySelector('input[name=occ]:checked') || {}).value);
+  function setOcc(id) { const r = $('setup').querySelector(`input[name=occ][value="${id}"]`); if (r) r.checked = true; }
+  function fillOccTiles() {
     const ids = Object.keys(OCCASIONS);
-    $('occWrap').hidden = ids.length < 2;   // appears automatically once a second occasion exists
-    for (const id of ids) { const o = document.createElement('option'); o.value = id; o.textContent = OCCASIONS[id].label; $('occIn').appendChild(o); }
+    $('occWrap').hidden = ids.length < 2;
+    $('occTiles').innerHTML = ids.map(id => `<label class="tile"><input type="radio" name="occ" value="${id}" id="occ-${id}"><span><svg viewBox="0 0 24 24" aria-hidden="true">${OCCASIONS[id].icon}</svg>${esc(OCCASIONS[id].label)}</span></label>`).join('');
   }
   function applyOccLabels() {
-    const O = OCCASIONS[occOf($('occIn').value)];
+    const O = OCCASIONS[getOcc()];
     $('nameLbl').textContent = O.name.label; $('nameIn').placeholder = O.name.placeholder;
     $('dateIn').closest('label').hidden = !!O.fixed;
     if (O.date) {
@@ -359,7 +370,7 @@
     if (O.count) $('ageLbl').textContent = O.count.label;
   }
   function loadForm() {
-    $('occIn').value = cfg.o;
+    setOcc(cfg.o);
     applyOccLabels();
     $('nameIn').value = cfg.sample ? '' : cfg.n;
     $('dateIn').value = cfg.sample || OCCASIONS[cfg.o].fixed ? '' : cfg.d;
@@ -367,7 +378,7 @@
     $('ageIn').checked = cfg.age;
   }
   function formPreview() {
-    const o = occOf($('occIn').value), O = OCCASIONS[o];
+    const o = getOcc(), O = OCCASIONS[o];
     applyOccLabels();
     const d = $('dateIn').value;
     const base = O.fixed ? { d: sampleDate(O), sample: false }
@@ -379,9 +390,10 @@
     render();
   }
   ['input', 'change'].forEach(ev => $('setup').addEventListener(ev, formPreview));
+  $('occTiles').addEventListener('change', () => { if (!$('nameIn').value.trim()) $('nameIn').focus({ preventScroll: true }); });
   $('setup').addEventListener('submit', e => {
     e.preventDefault();
-    const o = occOf($('occIn').value), O = OCCASIONS[o];
+    const o = getOcc(), O = OCCASIONS[o];
     const n = $('nameIn').value.trim();
     const d = O.fixed ? sampleDate(O) : $('dateIn').value;
     const err = (msg, el) => { $('formErr').textContent = msg; el.focus(); };
@@ -393,6 +405,13 @@
     try { history.replaceState(null, '', shareUrl(cfg)); } catch {}
     mode = 'run'; celebratedFor = null; applyMode(); render();
     scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  });
+  $('newCd').addEventListener('click', () => {
+    cfg = sampleConfig(); mode = 'setup'; celebratedFor = null; rehearsalEnd = null;
+    loadForm(); $('nameIn').value = ''; $('dateIn').value = '';
+    applyMode(); render();
+    try { history.replaceState(null, '', location.pathname); } catch {}
+    $('occWrap').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
   });
   $('edit').addEventListener('click', () => {
     mode = 'setup'; loadForm(); applyMode(); render();
@@ -524,7 +543,7 @@
   addEventListener('resize', resizeAll);
 
   // ---------- boot ----------
-  fillOccSelect();
+  fillOccTiles();
   fillTzSelect();
   loadForm();
   applyMode();

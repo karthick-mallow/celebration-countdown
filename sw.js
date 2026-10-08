@@ -1,6 +1,6 @@
 // Offline support. Network-first for the app's own files so updates show up on the next load;
 // cache is the fallback when offline. Fonts: stale-while-revalidate.
-const VERSION = 'bdc-v6';
+const VERSION = 'bdc-v7';
 const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/favicon.png', 'icons/apple-touch-icon.png'];
 
