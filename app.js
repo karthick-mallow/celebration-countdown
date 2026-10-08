@@ -545,7 +545,15 @@
   setInterval(() => { if (document.hidden) render(); }, 1000);
 
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    // Reload once when a new version takes over, so returning visitors never sit on an old build.
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || reloaded || document.body.classList.contains('stage')) return;
+      reloaded = true; location.reload();
+    });
+    addEventListener('load', () => navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      .then(r => r.update()).catch(() => {}));
   }
 
   // test hook (no effect on users)

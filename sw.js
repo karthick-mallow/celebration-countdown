@@ -1,10 +1,11 @@
-// Offline support: app shell cache-first, fonts stale-while-revalidate.
-const VERSION = 'bdc-v4';
+// Offline support. Network-first for the app's own files so updates show up on the next load;
+// cache is the fallback when offline. Fonts: stale-while-revalidate.
+const VERSION = 'bdc-v5';
 const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/favicon.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k))))
@@ -15,16 +16,13 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin === location.origin) {
-    // Navigations (any ?n=&d= link) get the cached index; network refreshes it.
-    if (req.mode === 'navigate') {
-      e.respondWith(fetch(req).then(r => { const copy = r.clone(); caches.open(VERSION).then(c => c.put('index.html', copy)); return r; })
-        .catch(() => caches.match('index.html')));
-      return;
-    }
-    e.respondWith(caches.match(req, { ignoreSearch: true }).then(hit => hit || fetch(req).then(r => {
-      if (r.ok) { const copy = r.clone(); caches.open(VERSION).then(c => c.put(req, copy)); }
-      return r;
-    })));
+    const key = req.mode === 'navigate' ? 'index.html' : url.pathname;
+    e.respondWith(
+      fetch(req, { cache: 'no-cache' }).then(r => {
+        if (r.ok) { const copy = r.clone(); caches.open(VERSION).then(c => c.put(key, copy)); }
+        return r;
+      }).catch(async () => (await caches.match(key)) || (await caches.match(req, { ignoreSearch: true })) || caches.match('index.html'))
+    );
     return;
   }
   if (url.host === 'fonts.googleapis.com' || url.host === 'fonts.gstatic.com') {
