@@ -197,6 +197,8 @@
   let cfg = startOcc ? null : readConfig();
   let mode = cfg ? 'run' : 'setup';
   if (startOcc) { cfg = sampleConfig(occOf(startOcc)); try { history.replaceState(null, '', location.pathname); } catch {} }
+  // A fresh setup starts by choosing the occasion; nothing occasion-specific shows until one is picked.
+  let picked = mode === 'run' || !!startOcc;
   if (!cfg) cfg = sampleConfig();
 
   // ---------- date math ----------
@@ -251,6 +253,7 @@
   function displayName() { return cfg.n.trim(); }
 
   function render() {
+    if (document.body.classList.contains('choosing')) { setTitle('Celebration Countdown'); return; }
     const now = Date.now();
     const nm = displayName();
     const O = occ();
@@ -327,6 +330,7 @@
   // ---------- views ----------
   function applyMode() {
     const run = mode === 'run';
+    document.body.classList.toggle('choosing', !run && !picked);
     $('setup').hidden = run;
     $('runActions').hidden = !run;
     if (!run) $('shareBox').hidden = true;
@@ -373,7 +377,8 @@
     if (O.count) $('ageLbl').textContent = O.count.label;
   }
   function loadForm() {
-    setOcc(cfg.o);
+    if (picked) setOcc(cfg.o);
+    else $('setup').querySelectorAll('input[name=occ]').forEach(r => { r.checked = false; });
     applyOccLabels();
     $('nameIn').value = cfg.sample ? '' : cfg.n;
     $('dateIn').value = cfg.sample || OCCASIONS[cfg.o].fixed ? '' : cfg.d;
@@ -393,7 +398,8 @@
     render();
   }
   ['input', 'change'].forEach(ev => $('setup').addEventListener(ev, formPreview));
-  $('occTiles').addEventListener('change', () => { if (!$('nameIn').value.trim()) $('nameIn').focus({ preventScroll: true }); });
+  $('occTiles').addEventListener('change', () => {
+    if (!picked) { picked = true; applyMode(); scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); } if (!$('nameIn').value.trim()) $('nameIn').focus({ preventScroll: true }); });
   $('setup').addEventListener('submit', e => {
     e.preventDefault();
     const o = getOcc(), O = OCCASIONS[o];
@@ -410,14 +416,14 @@
     scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
   });
   $('newCd').addEventListener('click', () => {
-    cfg = sampleConfig(); mode = 'setup'; celebratedFor = null; rehearsalEnd = null;
+    cfg = sampleConfig(); mode = 'setup'; picked = false; celebratedFor = null; rehearsalEnd = null;
     loadForm(); $('nameIn').value = ''; $('dateIn').value = '';
     applyMode(); render();
     try { history.replaceState(null, '', location.pathname); } catch {}
-    $('occWrap').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
   });
   $('edit').addEventListener('click', () => {
-    mode = 'setup'; loadForm(); applyMode(); render();
+    mode = 'setup'; picked = true; loadForm(); applyMode(); render();
     $('nameIn').focus();
   });
 

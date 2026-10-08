@@ -158,3 +158,14 @@ body:not(.stage) #exitStage { display: none; }
 .tile input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 2px; }
 @media (max-width: 400px) { .tile span { padding-block: 12px 10px; font-size: 12px; } .tile svg { width: 26px; height: 26px; } }
 @media (prefers-reduced-motion: reduce) { .tile span { transition: none; } }
+
+/* Fresh setup: choose the occasion first */
+.setup-rest { display: grid; gap: 14px; }
+body.choosing main > header, body.choosing #clock, body.choosing #celebrate, body.choosing .setup-rest { display: none !important; }
+body.choosing .setup { border-top: 0; padding-top: 0; }
+body.choosing #setupTitle { display: none; }
+body.choosing .occasions legend { font: 800 clamp(28px, 5vw, 44px)/1.1 var(--font-display); color: var(--ink); margin-bottom: 8px; text-wrap: balance; }
+.occ-intro { display: none; margin: -2px 0 8px; color: var(--muted); font-size: 16px; }
+body.choosing .occ-intro { display: block; }
+body.choosing .tile span { padding-block: 22px 18px; font-size: 14px; }
+body.choosing .tile svg { width: 36px; height: 36px; }

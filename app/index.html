@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap">
-<link rel="stylesheet" href="../styles.css?v=9">
+<link rel="stylesheet" href="../styles.css?v=10">
 </head>
 <body>
 <canvas id="stars" aria-hidden="true"></canvas>
@@ -33,8 +33,8 @@
 
 <main>
   <header>
-    <div class="eyebrow" id="eyebrow">Counting down to midnight</div>
-    <h1 id="headline"><span class="name" id="hName">Your</span> <span id="hOcc">birthday</span></h1>
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1 id="headline"><span class="name" id="hName"></span> <span id="hOcc"></span></h1>
     <p class="sub" id="sub">&nbsp;</p>
   </header>
 
@@ -69,11 +69,13 @@
 
   <!-- Setup view -->
   <form class="setup" id="setup" novalidate>
-    <h3>Set up a countdown</h3>
+    <h3 id="setupTitle">Set up a countdown</h3>
     <fieldset class="occasions" id="occWrap">
       <legend>What are you celebrating?</legend>
+      <p class="occ-intro">Pick one to set up your countdown to midnight.</p>
       <div class="tiles" id="occTiles"></div>
     </fieldset>
+    <div class="setup-rest">
     <div class="fields">
       <label for="nameIn"><span id="nameLbl">Name</span>
         <input id="nameIn" name="n" type="text" maxlength="40" autocomplete="off" placeholder="e.g. Aarav" required>
@@ -91,6 +93,7 @@
       <button class="primary" type="submit">Start countdown</button>
     </div>
     <p class="hint">The preview above updates as you type. Nothing is uploaded: details stay in your browser and in the link you share.</p>
+    </div>
   </form>
 
   <footer>
@@ -99,6 +102,6 @@
 </main>
 
 <noscript><p class="noscript">This countdown needs JavaScript turned on.</p></noscript>
-<script src="../app.js?v=9"></script>
+<script src="../app.js?v=10"></script>
 </body>
 </html>
