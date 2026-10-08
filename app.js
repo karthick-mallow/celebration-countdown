@@ -192,8 +192,11 @@
     return `${location.origin}${location.pathname}?${q.toString()}`;
   }
 
-  let cfg = readConfig();
+  // ?new=<occasion> (from the landing page) opens a blank setup with that occasion picked
+  const startOcc = new URLSearchParams(location.search).get('new');
+  let cfg = startOcc ? null : readConfig();
   let mode = cfg ? 'run' : 'setup';
+  if (startOcc) { cfg = sampleConfig(occOf(startOcc)); try { history.replaceState(null, '', location.pathname); } catch {} }
   if (!cfg) cfg = sampleConfig();
 
   // ---------- date math ----------
@@ -573,7 +576,7 @@
       if (!hadController || reloaded || touched || document.body.classList.contains('stage')) return;
       reloaded = true; location.reload();
     });
-    addEventListener('load', () => navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+    addEventListener('load', () => navigator.serviceWorker.register('../sw.js', { scope: '../', updateViaCache: 'none' })
       .then(r => r.update()).catch(() => {}));
   }
 

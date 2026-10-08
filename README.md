@@ -2,7 +2,18 @@
 
 A full-screen countdown to 00:00 on birthdays, anniversaries, weddings, festivals and more, with confetti when it hits zero.
 
-**Live:** https://karthick-mallow.github.io/celebration-countdown/
+**Landing page:** https://karthick-mallow.github.io/celebration-countdown/
+**App:** https://karthick-mallow.github.io/celebration-countdown/app/
+
+## Structure
+| Path | What |
+|---|---|
+| `index.html`, `landing.css`, `landing.js` | Landing page (live countdown to tonight's midnight, 10-second demo, occasion links) |
+| `app/index.html`, `app.js`, `styles.css` | The countdown app |
+| `sw.js`, `manifest.webmanifest`, `icons/` | Offline support and install, shared by both |
+| `404.html` | Not-found page; forwards stray share links to the app |
+
+Links: `app/?new=<occasion>` opens a blank setup with that occasion picked. Share links look like `app/?o=…&n=…&d=…&tz=…`. Older links at the site root (`/?n=…&d=…`) are redirected to `app/`.
 
 ## Features
 - Countdown to midnight in **any time zone** (DST-safe). Viewers elsewhere see their own local time too.

@@ -3,102 +3,107 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+  // Old share links pointed here (…/?n=…&d=…). Send them to the app before anything renders.
+  if (/[?&]d=/.test(location.search)) location.replace('app/' + location.search + location.hash);
+</script>
 <title>Celebration Countdown</title>
-<meta name="description" content="A full-screen countdown to midnight for birthdays, anniversaries, weddings, festivals and more, with confetti when the clock hits zero. Works in any time zone. Free, no sign-up.">
+<meta name="description" content="Free midnight countdown for birthdays, anniversaries, weddings, New Year and festivals. Share one link, go full screen, and celebrate with confetti at 00:00 in any time zone.">
 <meta name="theme-color" content="#0d1030">
+<link rel="canonical" href="https://karthick-mallow.github.io/celebration-countdown/">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Countdown">
-
 <meta property="og:type" content="website">
 <meta property="og:title" content="Celebration Countdown">
 <meta property="og:description" content="Count down to midnight on the big day, then celebrate with confetti.">
 <meta property="og:image" content="https://karthick-mallow.github.io/celebration-countdown/icons/og-image.png">
 <meta property="og:url" content="https://karthick-mallow.github.io/celebration-countdown/">
 <meta name="twitter:card" content="summary_large_image">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap">
-<link rel="stylesheet" href="styles.css?v=7">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap">
+<link rel="stylesheet" href="landing.css?v=1">
 </head>
 <body>
 <canvas id="stars" aria-hidden="true"></canvas>
 <canvas id="confetti" aria-hidden="true"></canvas>
-<button id="exitStage" class="ghost" type="button">Exit full screen</button>
 
-<main>
-  <header>
-    <div class="eyebrow" id="eyebrow">Counting down to midnight</div>
-    <h1 id="headline"><span class="name" id="hName">Your</span> <span id="hOcc">birthday</span></h1>
-    <p class="sub" id="sub">&nbsp;</p>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="./"><img src="icons/icon-192.png" alt="" width="32" height="32">Celebration Countdown</a>
+    <a class="top-link" href="app/">Open the app</a>
   </header>
 
-  <section class="clock" id="clock" aria-label="Time remaining">
-    <div class="cell"><div class="num" id="d">00</div><div class="unit">Days</div></div>
-    <div class="cell"><div class="num" id="h">00</div><div class="unit">Hours</div></div>
-    <div class="cell"><div class="num" id="m">00</div><div class="unit">Minutes</div></div>
-    <div class="cell" id="secCell"><div class="num" id="s">00</div><div class="unit">Seconds</div></div>
+  <section class="hero">
+    <div>
+      <h1>Be there when the clock strikes twelve.</h1>
+      <p class="lede">Set a countdown for a birthday, anniversary, wedding or festival. Share one link with family anywhere in the world, put it on the big screen, and the confetti starts at 00:00.</p>
+      <div class="ctas">
+        <a class="btn primary" href="app/">Start a countdown</a>
+        <button class="btn" id="demo" type="button">Watch midnight in 10 seconds</button>
+      </div>
+      <p class="resume" id="resume" hidden>You have a countdown saved on this device. <a href="app/">Open it</a></p>
+    </div>
+
+    <div class="clockcard" aria-live="off">
+      <p class="where" id="where">Time left until midnight where you are</p>
+      <div class="digits" id="digits">
+        <div><b id="hh">--</b><small>hours</small></div>
+        <div><b id="mm">--</b><small>minutes</small></div>
+        <div class="sec"><b id="ss">--</b><small>seconds</small></div>
+      </div>
+      <p class="cheer" id="cheer" hidden>It's midnight!</p>
+      <p class="note" id="note">This is tonight's real midnight. Your countdown looks like this, with the name and date you choose.</p>
+    </div>
   </section>
 
-  <section class="celebrate" id="celebrate" hidden aria-live="polite">
-    <h2 id="cheer">Happy Birthday!</h2>
-    <p id="cheerSub">The clock struck midnight.</p>
+  <section class="block" id="occasions">
+    <h2>Pick what you're celebrating</h2>
+    <p class="intro">Nine kinds of occasions. Each one sets its own wording, from "Aarav's birthday, turning 5" to "Happy Diwali!" at midnight.</p>
+    <div class="occ">
+      <a href="app/?new=birthday"><svg viewBox="0 0 24 24" aria-hidden="true"><path d='M4 21h16M5 21v-7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7M5 16.5c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0M12 12V9'/><path d='M12 9c-1 0-1.6-.8-1.6-1.7C10.4 6 12 4 12 4s1.6 2 1.6 3.3c0 .9-.6 1.7-1.6 1.7z'/></svg><div><strong>Birthday</strong><span>Counts to midnight every year and shows the age they turn.</span></div></a>
+      <a href="app/?new=anniversary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d='M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z'/></svg><div><strong>Anniversary</strong><span>Every year on the wedding date, with the number of years.</span></div></a>
+      <a href="app/?new=wedding"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx='9' cy='14.5' r='5'/><circle cx='15' cy='14.5' r='5'/><path d='M13.3 5.5h3.4l1 1.4L15 9.5l-2.7-2.6z'/></svg><div><strong>Wedding day</strong><span>One countdown to the big day.</span></div></a>
+      <a href="app/?new=newyear"><svg viewBox="0 0 24 24" aria-hidden="true"><path d='M12 3v3.5M12 17.5V21M3 12h3.5M17.5 12H21M5.6 5.6l2.5 2.5M15.9 15.9l2.5 2.5M5.6 18.4l2.5-2.5M15.9 8.1l2.5-2.5'/><circle cx='12' cy='12' r='1.6'/></svg><div><strong>New Year</strong><span>Always set to 1 January. No date to enter.</span></div></a>
+      <a href="app/?new=festival"><svg viewBox="0 0 24 24" aria-hidden="true"><path d='M3 14.5c0 2.8 4 4.5 9 4.5s9-1.7 9-4.5H3zM9 21.5h6'/><path d='M12 11.5c-1.3 0-2-1-2-2.2C10 7.6 12 5 12 5s2 2.6 2 4.3c0 1.2-.7 2.2-2 2.2z'/></svg><div><strong>Festival</strong><span>Diwali, Eid, Christmas, Pongal or any festival you name.</span></div></a>
+      <a href="app/?new=baby"><svg viewBox="0 0 24 24" aria-hidden="true"><path d='M5 4.5a7.5 7.5 0 0 1 7.5 7.5H5zM12.5 12H19M5 12a7 4.2 0 0 0 14 0M2.5 4.5H5'/><circle cx='8' cy='19.5' r='1.6'/><circle cx='16' cy='19.5' r='1.6'/></svg><div><strong>Baby arrival</strong><span>Count down to the due date.</span></div></a>
+      <a href="app/?new=graduation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d='M2 9.5l10-5 10 5-10 5zM6 11.5v4.8c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.8M22 9.5v5.5'/></svg><div><strong>Graduation</strong><span>For the day they walk across the stage.</span></div></a>
+      <a href="app/?new=retirement"><svg viewBox="0 0 24 24" aria-hidden="true"><path d='M3 18h18M6.5 18a5.5 5.5 0 0 1 11 0M12 7V4.5M6.3 10.3 4.6 8.6M17.7 10.3l1.7-1.7M8 21.5h8'/></svg><div><strong>Retirement</strong><span>Mark the last day and the start of the next chapter.</span></div></a>
+      <a href="app/?new=event"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x='3.5' y='5' width='17' height='15.5' rx='2'/><path d='M3.5 10h17M8 3v4M16 3v4M12 12.5l1.1 2.2 2.4.4-1.75 1.7.4 2.4-2.15-1.15-2.15 1.15.4-2.4-1.75-1.7 2.4-.4z'/></svg><div><strong>Custom event</strong><span>A housewarming, a launch or anything with a date.</span></div></a>
+    </div>
   </section>
 
-  <!-- Countdown view controls -->
-  <div class="actions" id="runActions" hidden>
-    <button class="primary" id="goStage" type="button">Full screen</button>
-    <button id="share" type="button">Share link</button>
-    <button id="rehearse" type="button">Rehearse midnight</button>
-    <button id="edit" class="ghost" type="button">Edit</button>
-    <button id="newCd" class="ghost" type="button">New countdown</button>
-  </div>
-  <div class="sharebox" id="shareBox" hidden>
-    <label for="shareUrl">Anyone with this link sees the same countdown</label>
-    <div class="sharerow">
-      <input id="shareUrl" type="text" readonly>
-      <button id="copyUrl" type="button">Copy</button>
-    </div>
-    <p class="hint" id="copyMsg" aria-live="polite">&nbsp;</p>
-  </div>
+  <section class="block">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li><h3>Choose the occasion and date</h3><p>Pick one of the nine occasions, then type a name and the date. The preview updates as you type.</p></li>
+      <li><h3>Share the link</h3><p>Send it on WhatsApp or anywhere else. Everyone who opens it sees the same countdown to the same midnight.</p></li>
+      <li><h3>Go full screen</h3><p>Leave it on a TV, laptop or phone. The last minute shows giant seconds, then the confetti starts.</p></li>
+    </ol>
+  </section>
 
-  <!-- Setup view -->
-  <form class="setup" id="setup" novalidate>
-    <h3>Set up a countdown</h3>
-    <fieldset class="occasions" id="occWrap">
-      <legend>What are you celebrating?</legend>
-      <div class="tiles" id="occTiles"></div>
-    </fieldset>
-    <div class="fields">
-      <label for="nameIn"><span id="nameLbl">Name</span>
-        <input id="nameIn" name="n" type="text" maxlength="40" autocomplete="off" placeholder="e.g. Aarav" required>
-      </label>
-      <label for="dateIn"><span id="dateLbl">Date of birth</span>
-        <input id="dateIn" name="d" type="date" required>
-      </label>
-      <label for="tzIn" class="wide">Celebrate at midnight in
-        <select id="tzIn" name="tz"></select>
-      </label>
-    </div>
-    <label class="check" for="ageIn"><input id="ageIn" type="checkbox" checked> <span id="ageLbl">Show the age they are turning</span></label>
-    <p class="error" id="formErr" aria-live="polite"></p>
-    <div class="actions left">
-      <button class="primary" type="submit">Start countdown</button>
-    </div>
-    <p class="hint">The preview above updates as you type. Nothing is uploaded: details stay in your browser and in the link you share.</p>
-  </form>
+  <section class="block">
+    <h2>Made for families in different time zones</h2>
+    <dl class="features">
+      <div><dt>Midnight in the right place</dt><dd>Choose whose midnight counts. Cousins in Toronto and grandparents in Chennai reach zero at the same moment, and each person also sees the time on their own clock.</dd></div>
+      <div><dt>No sign-up</dt><dd>There's no account to create. The name and date live in the link you share and in your own browser. Nothing is uploaded.</dd></div>
+      <div><dt>Works without internet</dt><dd>Add it to your phone's home screen. Once opened, it keeps counting even if the Wi-Fi drops at the party.</dd></div>
+      <div><dt>Free to use</dt><dd>No ads and no cost. Open it in any modern browser on a phone, tablet, laptop or smart TV.</dd></div>
+    </dl>
+  </section>
+
+  <section class="block closing">
+    <h2>Who's celebrating next?</h2>
+    <a class="btn primary" href="app/">Start a countdown</a>
+  </section>
 
   <footer>
-    <span>Works offline once opened. Add it to your home screen from the browser menu.</span>
+    <span>Celebration Countdown</span>
+    <a href="app/">Open the app</a>
   </footer>
-</main>
+</div>
 
-<noscript><p class="noscript">This countdown needs JavaScript turned on.</p></noscript>
-<script src="app.js?v=8"></script>
+<script src="landing.js?v=1"></script>
 </body>
 </html>

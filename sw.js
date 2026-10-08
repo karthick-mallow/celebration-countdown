@@ -1,7 +1,7 @@
 // Offline support. Network-first for the app's own files so updates show up on the next load;
 // cache is the fallback when offline. Fonts: stale-while-revalidate.
-const VERSION = 'bdc-v8';
-const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest',
+const VERSION = 'bdc-v9';
+const SHELL = ['./', 'index.html', 'landing.css', 'landing.js', 'app/', 'app/index.html', 'styles.css', 'app.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/favicon.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
@@ -16,12 +16,13 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin === location.origin) {
-    const key = req.mode === 'navigate' ? 'index.html' : url.pathname;
+    const key = url.pathname;   // query strings (share links, ?v=) share one cache entry per file
     e.respondWith(
       fetch(req, { cache: 'no-cache' }).then(r => {
         if (r.ok) { const copy = r.clone(); caches.open(VERSION).then(c => c.put(key, copy)); }
         return r;
-      }).catch(async () => (await caches.match(key)) || (await caches.match(req, { ignoreSearch: true })) || caches.match('index.html'))
+      }).catch(async () => (await caches.match(key)) || (await caches.match(req, { ignoreSearch: true }))
+        || (req.mode === 'navigate' ? caches.match(url.pathname.includes('/app/') ? 'app/' : './') : undefined))
     );
     return;
   }

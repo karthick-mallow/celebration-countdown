@@ -2,7 +2,7 @@
   "name": "Celebration Countdown",
   "short_name": "Countdown",
   "description": "Count down to midnight on the big day, then celebrate with confetti.",
-  "start_url": "./",
+  "start_url": "./app/",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
