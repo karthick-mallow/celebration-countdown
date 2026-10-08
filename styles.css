@@ -25,7 +25,7 @@ body {
   padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
   -webkit-font-smoothing: antialiased;
 }
-#stars, #confetti { position: fixed; inset: 0; pointer-events: none; }
+#stars, #confetti { position: fixed; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
 #stars { z-index: 0; }
 #confetti { z-index: 5; }
 main {
