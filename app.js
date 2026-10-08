@@ -46,6 +46,31 @@
   }
   const isLeap = y => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
 
+  // ---------- occasions ----------
+  // Add a new celebration by adding one entry here. `recurs`: 'yearly' (every year on the date) or 'once' (that exact date).
+  const ord = n => { const s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
+  const OCCASIONS = {
+    birthday: {
+      label: 'Birthday',
+      recurs: 'yearly',
+      nameLabel: 'Name', namePlaceholder: 'e.g. Aarav',
+      dateLabel: 'Date of birth',
+      countLabel: 'Show the age they are turning',
+      noun: 'birthday',
+      countPhrase: n => `turning ${n}`,
+      cheer: nm => nm ? `Happy Birthday, ${nm}!` : 'Happy Birthday!',
+      cheerSub: n => n ? `Happy ${ord(n)}! The clock struck midnight.` : 'The clock struck midnight.'
+    }
+    // Example of the next one:
+    // anniversary: { label: 'Anniversary', recurs: 'yearly', nameLabel: 'Couple', namePlaceholder: 'e.g. Priya & Arjun',
+    //   dateLabel: 'Wedding date', countLabel: 'Show the number of years', noun: 'anniversary',
+    //   countPhrase: n => `${ord(n)} anniversary`, cheer: nm => nm ? `Happy Anniversary, ${nm}!` : 'Happy Anniversary!',
+    //   cheerSub: n => n ? `${n} years together.` : 'The clock struck midnight.' },
+  };
+  const DEFAULT_OCC = 'birthday';
+  const occOf = id => OCCASIONS[id] ? id : DEFAULT_OCC;
+  const occ = () => OCCASIONS[cfg.o] || OCCASIONS[DEFAULT_OCC];
+
   // ---------- config ----------
   const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
   function validDate(s) {
@@ -57,20 +82,21 @@
   function readConfig() {
     const q = new URLSearchParams(location.search);
     if (validDate(q.get('d'))) {
-      return { n: (q.get('n') || '').slice(0, 40), d: q.get('d'), tz: validTz(q.get('tz')) ? q.get('tz') : LOCAL_TZ, age: q.get('a') !== '0', fromLink: true };
+      return { o: occOf(q.get('o')), n: (q.get('n') || '').slice(0, 40), d: q.get('d'), tz: validTz(q.get('tz')) ? q.get('tz') : LOCAL_TZ, age: q.get('a') !== '0', fromLink: true };
     }
     try {
       const s = JSON.parse(store.get('bdc.config') || 'null');
-      if (s && validDate(s.d)) return { n: String(s.n || '').slice(0, 40), d: s.d, tz: validTz(s.tz) ? s.tz : LOCAL_TZ, age: s.age !== false };
+      if (s && validDate(s.d)) return { o: occOf(s.o), n: String(s.n || '').slice(0, 40), d: s.d, tz: validTz(s.tz) ? s.tz : LOCAL_TZ, age: s.age !== false };
     } catch {}
     return null;
   }
   function sampleConfig() {
     const t = new Date(Date.now() + 30 * 864e5);
-    return { n: '', d: `${t.getFullYear() - 30}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`, tz: LOCAL_TZ, age: true, sample: true };
+    return { o: DEFAULT_OCC, n: '', d: `${t.getFullYear() - 30}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`, tz: LOCAL_TZ, age: true, sample: true };
   }
   function shareUrl(c) {
     const q = new URLSearchParams();
+    if (c.o !== DEFAULT_OCC) q.set('o', c.o);
     if (c.n.trim()) q.set('n', c.n.trim());
     q.set('d', c.d);
     q.set('tz', c.tz);
@@ -82,28 +108,32 @@
   let mode = cfg ? 'run' : 'setup';
   if (!cfg) cfg = sampleConfig();
 
-  // ---------- birthday math ----------
-  function birthdayYMD(year) {
+  // ---------- date math ----------
+  function occurrenceYMD(year) {
     let [, m, d] = cfg.d.split('-').map(Number);
     m -= 1;
     if (m === 1 && d === 29 && !isLeap(year)) d = 28;
     return [year, m, d];
   }
-  function nextBirthday(now) {
+  function nextOccurrence(now) {
+    if (occ().recurs === 'once') {
+      const [Y, M, D] = cfg.d.split('-').map(Number);
+      const start = midnightIn(Y, M - 1, D, cfg.tz), end = midnightIn(Y, M - 1, D + 1, cfg.tz);
+      return { target: start, year: Y, isToday: now >= start && now < end, passed: now >= end };
+    }
     const yNow = zoned(now, cfg.tz).y;
     for (const y of [yNow - 1, yNow, yNow + 1]) {
-      const [Y, M, D] = birthdayYMD(y);
+      const [Y, M, D] = occurrenceYMD(y);
       const start = midnightIn(Y, M, D, cfg.tz);
       const end = midnightIn(Y, M, D + 1, cfg.tz);
       if (now < start) return { target: start, year: Y, isToday: false };
       if (now < end) return { target: start, year: Y, isToday: true };
     }
-    const [Y, M, D] = birthdayYMD(yNow + 2);
+    const [Y, M, D] = occurrenceYMD(yNow + 2);
     return { target: midnightIn(Y, M, D, cfg.tz), year: Y, isToday: false };
   }
 
   // ---------- formatting ----------
-  const ord = n => { const s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
   const esc = s => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const TZ_ALIAS = { Calcutta: 'Kolkata', Saigon: 'Ho Chi Minh', Kiev: 'Kyiv', Rangoon: 'Yangon', Katmandu: 'Kathmandu' };
   const tzCity = tz => { const c = tz.split('/').pop().replace(/_/g, ' '); return TZ_ALIAS[c] || c; };
@@ -132,8 +162,10 @@
   function render() {
     const now = Date.now();
     const nm = displayName();
+    const O = occ();
     $('hName').textContent = nm ? `${nm}'s` : (cfg.sample ? 'Your' : 'The');
-    let target, isToday, year, rehearsing = false;
+    $('hOcc').textContent = O.noun;
+    let target, isToday, year, passed = false, rehearsing = false;
 
     if (rehearsalEnd) {
       rehearsing = true;
@@ -141,28 +173,37 @@
       isToday = now >= target;
       year = null;
     } else {
-      ({ target, isToday, year } = nextBirthday(now));
+      ({ target, isToday, year, passed = false } = nextOccurrence(now));
     }
 
     const by = +cfg.d.slice(0, 4);
-    const age = cfg.age && year ? year - by : null;
+    const age = cfg.age && year && O.recurs === 'yearly' ? year - by : null;
     const showAge = age && age > 0 && age < 150;
-    const crossTz = cfg.tz !== LOCAL_TZ;
+    // Compare wall clocks, not names (Asia/Calcutta and Asia/Kolkata are the same zone)
+    const zA = zoned(target, cfg.tz), zB = zoned(target, LOCAL_TZ);
+    const crossTz = zA.d !== zB.d || zA.h !== zB.h || zA.mi !== zB.mi;
 
     if (isToday) {
       const key = rehearsing ? 'rehearsal' : `${cfg.d}|${cfg.tz}|${year}`;
       $('clock').hidden = true;
       $('celebrate').hidden = false;
       $('eyebrow').textContent = rehearsing ? 'Rehearsal' : "It's the day";
-      $('cheer').textContent = nm ? `Happy Birthday, ${nm}!` : 'Happy Birthday!';
-      $('cheerSub').textContent = showAge && !rehearsing ? `Happy ${ord(age)}! The clock struck midnight.` : 'The clock struck midnight.';
+      $('cheer').textContent = O.cheer(nm);
+      $('cheerSub').textContent = O.cheerSub(showAge && !rehearsing ? age : null);
       $('sub').innerHTML = rehearsing ? 'That was a practice run.' : `Today, <strong>${esc(fmtDate(target, cfg.tz))}</strong>`;
       if (celebratedFor !== key) { celebratedFor = key; celebrate(); }
-      setTitle(nm ? `Happy Birthday, ${nm}!` : 'Happy Birthday!');
+      setTitle(O.cheer(nm));
       if (rehearsing && now - target > 15000) { rehearsalEnd = null; celebratedFor = null; }
       return;
     }
 
+    if (passed) {
+      $('clock').hidden = true; $('celebrate').hidden = true;
+      $('eyebrow').textContent = 'Already celebrated';
+      $('sub').innerHTML = `This was on <strong>${esc(fmtDate(target, cfg.tz))}</strong>. Edit to set a new date.`;
+      setTitle(`${nm ? nm + "'s " : ''}${O.noun}`);
+      return;
+    }
     $('clock').hidden = false;
     $('celebrate').hidden = true;
     $('eyebrow').textContent = rehearsing ? 'Rehearsal · 10 seconds' : (cfg.sample ? 'Preview' : 'Counting down to midnight');
@@ -172,7 +213,7 @@
     } else {
       let html = `Starts at 00:00 on <strong>${esc(fmtDate(target, cfg.tz))}</strong>`;
       if (crossTz) html += ` in ${esc(tzCity(cfg.tz))} <span class="nowrap">(${esc(fmtLocalTime(target))} your time)</span>`;
-      if (showAge) html += ` · turning ${age}`;
+      if (showAge) html += ` · ${esc(O.countPhrase(age))}`;
       $('sub').innerHTML = html;
     }
 
@@ -186,7 +227,7 @@
     const finalMinute = days === 0 && hrs === 0 && mins === 0;
     $('secCell').classList.toggle('final', finalMinute);
     $('clock').classList.toggle('last', finalMinute);
-    setTitle(`${days ? days + 'd ' : ''}${pad(hrs)}:${pad(mins)}:${pad(secs)} · ${nm ? nm + "'s birthday" : 'Birthday countdown'}`);
+    setTitle(`${days ? days + 'd ' : ''}${pad(hrs)}:${pad(mins)}:${pad(secs)} · ${nm ? `${nm}'s ${O.noun}` : `${O.label} countdown`}`);
   }
   function setTitle(t) { if (t !== lastTitle) { document.title = t; lastTitle = t; } }
 
@@ -218,7 +259,20 @@
     }
     sel.appendChild(frag);
   }
+  function fillOccSelect() {
+    const ids = Object.keys(OCCASIONS);
+    $('occWrap').hidden = ids.length < 2;   // appears automatically once a second occasion exists
+    for (const id of ids) { const o = document.createElement('option'); o.value = id; o.textContent = OCCASIONS[id].label; $('occIn').appendChild(o); }
+  }
+  function applyOccLabels() {
+    const O = OCCASIONS[occOf($('occIn').value)];
+    $('nameLbl').textContent = O.nameLabel; $('nameIn').placeholder = O.namePlaceholder;
+    $('dateLbl').textContent = O.dateLabel; $('ageLbl').textContent = O.countLabel;
+    $('ageIn').closest('label').hidden = O.recurs !== 'yearly';
+  }
   function loadForm() {
+    $('occIn').value = cfg.o;
+    applyOccLabels();
     $('nameIn').value = cfg.sample ? '' : cfg.n;
     $('dateIn').value = cfg.sample ? '' : cfg.d;
     $('tzIn').value = cfg.tz;
@@ -228,7 +282,8 @@
   function formPreview() {
     const d = $('dateIn').value;
     const base = validDate(d) ? { d, sample: false } : { d: sampleConfig().d, sample: true };
-    cfg = { n: $('nameIn').value.slice(0, 40), tz: $('tzIn').value || LOCAL_TZ, age: $('ageIn').checked, ...base };
+    applyOccLabels();
+    cfg = { o: occOf($('occIn').value), n: $('nameIn').value.slice(0, 40), tz: $('tzIn').value || LOCAL_TZ, age: $('ageIn').checked, ...base };
     if (cfg.n.trim()) cfg.sample = false;
     celebratedFor = null;
     $('formErr').textContent = '';
@@ -240,7 +295,7 @@
     const n = $('nameIn').value.trim(), d = $('dateIn').value;
     if (!n) { $('formErr').textContent = 'Enter a name to show on the countdown.'; $('nameIn').focus(); return; }
     if (!validDate(d)) { $('formErr').textContent = 'Pick a date of birth from the calendar.'; $('dateIn').focus(); return; }
-    cfg = { n, d, tz: $('tzIn').value || LOCAL_TZ, age: $('ageIn').checked };
+    cfg = { o: occOf($('occIn').value), n, d, tz: $('tzIn').value || LOCAL_TZ, age: $('ageIn').checked };
     store.set('bdc.config', JSON.stringify(cfg));
     try { history.replaceState(null, '', shareUrl(cfg)); } catch {}
     mode = 'run'; celebratedFor = null; applyMode(); render();
@@ -258,7 +313,7 @@
     $('shareBox').hidden = false;
     $('copyMsg').innerHTML = '&nbsp;';
     if (navigator.share && matchMedia('(pointer: coarse)').matches) {
-      try { await navigator.share({ title: document.title, text: `Countdown to ${displayName() || 'the'} birthday`, url }); return; } catch {}
+      try { await navigator.share({ title: document.title, text: `Countdown to ${displayName() ? displayName() + "'s" : 'the'} ${occ().noun}`, url }); return; } catch {}
     }
   }
   async function copy() {
@@ -376,6 +431,7 @@
   addEventListener('resize', resizeAll);
 
   // ---------- boot ----------
+  fillOccSelect();
   fillTzSelect();
   loadForm();
   applyMode();
@@ -400,5 +456,5 @@
   }
 
   // test hook (no effect on users)
-  window.__bdc = { midnightIn, zoned, nextBirthday: (t, c) => { const old = cfg; cfg = c; const r = nextBirthday(t); cfg = old; return r; } };
+  window.__bdc = { midnightIn, zoned, nextOccurrence: (t, c) => { const old = cfg; cfg = { o: DEFAULT_OCC, ...c }; const r = nextOccurrence(t); cfg = old; return r; } };
 })();
