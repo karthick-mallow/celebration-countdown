@@ -1,6 +1,6 @@
 # Celebration Countdown
 
-A full-screen countdown to 00:00 on someone's birthday, with confetti when it hits zero.
+A full-screen countdown to 00:00 on birthdays, anniversaries, weddings, festivals and more, with confetti when it hits zero.
 
 **Live:** https://karthick-mallow.github.io/celebration-countdown/
 
@@ -14,18 +14,19 @@ A full-screen countdown to 00:00 on someone's birthday, with confetti when it hi
 - Feb 29 birthdays fall back to Feb 28 in non-leap years.
 
 ## Occasions
-Birthday is the first occasion. Each one is a single entry in the `OCCASIONS` registry in `app.js`:
+| Occasion | Repeats | Count shown |
+|---|---|---|
+| Birthday | yearly | age they are turning |
+| Anniversary | yearly | Nth anniversary |
+| Wedding day | once | — |
+| New Year | yearly, fixed Jan 1 (no date field) | the new year |
+| Festival (Diwali, Eid, Christmas, Pongal…) | once | — |
+| Baby arrival (due date) | once | — |
+| Graduation | once | — |
+| Retirement | once | — |
+| Custom event | once | — |
 
-| Field | Purpose |
-|---|---|
-| `label` | Name in the Occasion picker |
-| `recurs` | `yearly` (repeats on the date) or `once` (that exact date) |
-| `nameLabel`, `namePlaceholder`, `dateLabel`, `countLabel` | Setup form text |
-| `noun` | Headline: "Aarav's **birthday**" |
-| `countPhrase(n)` | e.g. "turning 5", "10th anniversary" |
-| `cheer(name)`, `cheerSub(n)` | Text shown at midnight |
-
-The Occasion picker stays hidden until a second entry exists. Links carry the occasion as `o=` (omitted for birthday, so existing links never break). A commented-out anniversary entry shows the shape. Bump `VERSION` in `sw.js` when you ship one.
+Each is one entry in `OCCASIONS` in `app.js` (field reference in the comment above it). One-time occasions reject past dates and show "Already celebrated" once the day has passed. Links carry the occasion as `o=`; birthday links omit it, so older links keep working. Bump `VERSION` in `sw.js` on every release.
 
 ## Stack
 Static HTML/CSS/JS, no build step. Hosted on GitHub Pages.

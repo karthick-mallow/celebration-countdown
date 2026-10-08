@@ -47,29 +47,109 @@
   const isLeap = y => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
 
   // ---------- occasions ----------
-  // Add a new celebration by adding one entry here. `recurs`: 'yearly' (every year on the date) or 'once' (that exact date).
+  // One entry per celebration. Fields:
+  //   recurs: 'yearly' (every year on the date) | 'once' (that exact date)
+  //   name:   { label, placeholder, required }
+  //   date:   { label, when: 'past' | 'future', sample: [yearsAgo, daysAhead] }   or  fixed: 'MM-DD' (no date field)
+  //   count:  { label, phrase(n) } | null   — yearly only; n = years since the date
+  //   head(nm, c) -> [highlighted, rest]   cheer(nm, c)   cheerSub(n, nm, c)   (c = { year })
   const ord = n => { const s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
+  const poss = (nm, noun) => nm ? [`${nm}'s`, noun] : ['Your', noun];
+  const titled = (nm, noun) => nm ? [nm, ''] : ['Your', noun];
   const OCCASIONS = {
     birthday: {
-      label: 'Birthday',
-      recurs: 'yearly',
-      nameLabel: 'Name', namePlaceholder: 'e.g. Aarav',
-      dateLabel: 'Date of birth',
-      countLabel: 'Show the age they are turning',
-      noun: 'birthday',
-      countPhrase: n => `turning ${n}`,
+      label: 'Birthday', recurs: 'yearly',
+      name: { label: 'Name', placeholder: 'e.g. Aarav', required: true },
+      date: { label: 'Date of birth', when: 'past', sample: [30, 30] },
+      count: { label: 'Show the age they are turning', phrase: n => `turning ${n}` },
+      head: nm => poss(nm, 'birthday'),
       cheer: nm => nm ? `Happy Birthday, ${nm}!` : 'Happy Birthday!',
       cheerSub: n => n ? `Happy ${ord(n)}! The clock struck midnight.` : 'The clock struck midnight.'
+    },
+    anniversary: {
+      label: 'Anniversary', recurs: 'yearly',
+      name: { label: 'Couple', placeholder: 'e.g. Priya & Arjun', required: true },
+      date: { label: 'Wedding date', when: 'past', sample: [10, 30] },
+      count: { label: 'Show the number of years', phrase: n => `${ord(n)} anniversary` },
+      head: nm => poss(nm, 'anniversary'),
+      cheer: nm => nm ? `Happy Anniversary, ${nm}!` : 'Happy Anniversary!',
+      cheerSub: n => n ? `${n} ${n === 1 ? 'year' : 'years'} together.` : 'The clock struck midnight.'
+    },
+    wedding: {
+      label: 'Wedding day', recurs: 'once',
+      name: { label: 'Couple', placeholder: 'e.g. Priya & Arjun', required: true },
+      date: { label: 'Wedding date', when: 'future', sample: [0, 45] },
+      count: null,
+      head: nm => poss(nm, 'wedding'),
+      cheer: nm => nm ? `Congratulations, ${nm}!` : 'Congratulations!',
+      cheerSub: () => 'The wedding day is here.'
+    },
+    newyear: {
+      label: 'New Year', recurs: 'yearly', fixed: '01-01',
+      name: { label: 'From (optional)', placeholder: 'e.g. The Sharma family', required: false },
+      count: null,
+      head: (nm, c) => ['New Year', String(c.year || '')],
+      cheer: (nm, c) => `Happy New Year${c.year ? ' ' + c.year : ''}!`,
+      cheerSub: (n, nm) => nm ? `With love from ${nm}.` : 'The clock struck midnight.'
+    },
+    festival: {
+      label: 'Festival', recurs: 'once',
+      name: { label: 'Festival', placeholder: 'e.g. Diwali, Eid, Christmas, Pongal', required: true },
+      date: { label: 'Festival date', when: 'future', sample: [0, 30] },
+      count: null,
+      head: nm => titled(nm, 'festival'),
+      cheer: nm => nm ? `Happy ${nm}!` : 'Happy festival!',
+      cheerSub: () => 'Let the celebrations begin.'
+    },
+    baby: {
+      label: 'Baby arrival', recurs: 'once',
+      name: { label: 'Family or baby name', placeholder: 'e.g. Baby Iyer', required: true },
+      date: { label: 'Due date', when: 'future', sample: [0, 60] },
+      count: null,
+      head: nm => poss(nm, 'due date'),
+      cheer: () => 'Welcome, little one!',
+      cheerSub: (n, nm) => nm ? `${nm}'s due date is here.` : 'The due date is here.'
+    },
+    graduation: {
+      label: 'Graduation', recurs: 'once',
+      name: { label: 'Graduate', placeholder: 'e.g. Meera', required: true },
+      date: { label: 'Graduation day', when: 'future', sample: [0, 40] },
+      count: null,
+      head: nm => poss(nm, 'graduation'),
+      cheer: nm => nm ? `Congratulations, ${nm}!` : 'Congratulations, graduate!',
+      cheerSub: () => 'Graduation day is here.'
+    },
+    retirement: {
+      label: 'Retirement', recurs: 'once',
+      name: { label: 'Name', placeholder: 'e.g. Ravi', required: true },
+      date: { label: 'Retirement day', when: 'future', sample: [0, 50] },
+      count: null,
+      head: nm => poss(nm, 'retirement'),
+      cheer: nm => nm ? `Happy Retirement, ${nm}!` : 'Happy Retirement!',
+      cheerSub: () => 'The next chapter starts now.'
+    },
+    event: {
+      label: 'Custom event', recurs: 'once',
+      name: { label: 'Event name', placeholder: 'e.g. Housewarming, Product launch', required: true },
+      date: { label: 'Event date', when: 'future', sample: [0, 21] },
+      count: null,
+      head: nm => titled(nm, 'event'),
+      cheer: nm => nm ? `It's here: ${nm}!` : "It's here!",
+      cheerSub: () => 'The countdown is over.'
     }
-    // Example of the next one:
-    // anniversary: { label: 'Anniversary', recurs: 'yearly', nameLabel: 'Couple', namePlaceholder: 'e.g. Priya & Arjun',
-    //   dateLabel: 'Wedding date', countLabel: 'Show the number of years', noun: 'anniversary',
-    //   countPhrase: n => `${ord(n)} anniversary`, cheer: nm => nm ? `Happy Anniversary, ${nm}!` : 'Happy Anniversary!',
-    //   cheerSub: n => n ? `${n} years together.` : 'The clock struck midnight.' },
   };
   const DEFAULT_OCC = 'birthday';
   const occOf = id => OCCASIONS[id] ? id : DEFAULT_OCC;
   const occ = () => OCCASIONS[cfg.o] || OCCASIONS[DEFAULT_OCC];
+  const isoDate = t => `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`;
+  function sampleDate(O) {
+    if (O.fixed) return `2000-${O.fixed}`;
+    const [yearsAgo, daysAhead] = O.date.sample;
+    const t = new Date(Date.now() + daysAhead * 864e5);
+    t.setFullYear(t.getFullYear() - yearsAgo);
+    return isoDate(t);
+  }
+  const headText = (O, nm, c) => O.head(nm, c).filter(Boolean).join(' ');
 
   // ---------- config ----------
   const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -90,9 +170,8 @@
     } catch {}
     return null;
   }
-  function sampleConfig() {
-    const t = new Date(Date.now() + 30 * 864e5);
-    return { o: DEFAULT_OCC, n: '', d: `${t.getFullYear() - 30}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`, tz: LOCAL_TZ, age: true, sample: true };
+  function sampleConfig(o = DEFAULT_OCC) {
+    return { o, n: '', d: sampleDate(OCCASIONS[o]), tz: LOCAL_TZ, age: true, sample: !OCCASIONS[o].fixed };
   }
   function shareUrl(c) {
     const q = new URLSearchParams();
@@ -110,7 +189,7 @@
 
   // ---------- date math ----------
   function occurrenceYMD(year) {
-    let [, m, d] = cfg.d.split('-').map(Number);
+    let [, m, d] = (occ().fixed ? `2000-${occ().fixed}` : cfg.d).split('-').map(Number);
     m -= 1;
     if (m === 1 && d === 29 && !isLeap(year)) d = 28;
     return [year, m, d];
@@ -163,8 +242,6 @@
     const now = Date.now();
     const nm = displayName();
     const O = occ();
-    $('hName').textContent = nm ? `${nm}'s` : (cfg.sample ? 'Your' : 'The');
-    $('hOcc').textContent = O.noun;
     let target, isToday, year, passed = false, rehearsing = false;
 
     if (rehearsalEnd) {
@@ -176,8 +253,12 @@
       ({ target, isToday, year, passed = false } = nextOccurrence(now));
     }
 
+    const c = { year: rehearsing ? null : year };
+    const [hi, rest] = O.head(nm, c);
+    $('hName').textContent = hi; $('hOcc').textContent = rest || '';
+    const heading = headText(O, nm, c);
     const by = +cfg.d.slice(0, 4);
-    const age = cfg.age && year && O.recurs === 'yearly' ? year - by : null;
+    const age = cfg.age && O.count && year && O.recurs === 'yearly' ? year - by : null;
     const showAge = age && age > 0 && age < 150;
     // Compare wall clocks, not names (Asia/Calcutta and Asia/Kolkata are the same zone)
     const zA = zoned(target, cfg.tz), zB = zoned(target, LOCAL_TZ);
@@ -188,11 +269,11 @@
       $('clock').hidden = true;
       $('celebrate').hidden = false;
       $('eyebrow').textContent = rehearsing ? 'Rehearsal' : "It's the day";
-      $('cheer').textContent = O.cheer(nm);
-      $('cheerSub').textContent = O.cheerSub(showAge && !rehearsing ? age : null);
+      $('cheer').textContent = O.cheer(nm, c);
+      $('cheerSub').textContent = O.cheerSub(showAge && !rehearsing ? age : null, nm, c);
       $('sub').innerHTML = rehearsing ? 'That was a practice run.' : `Today, <strong>${esc(fmtDate(target, cfg.tz))}</strong>`;
       if (celebratedFor !== key) { celebratedFor = key; celebrate(); }
-      setTitle(O.cheer(nm));
+      setTitle(O.cheer(nm, c));
       if (rehearsing && now - target > 15000) { rehearsalEnd = null; celebratedFor = null; }
       return;
     }
@@ -201,7 +282,7 @@
       $('clock').hidden = true; $('celebrate').hidden = true;
       $('eyebrow').textContent = 'Already celebrated';
       $('sub').innerHTML = `This was on <strong>${esc(fmtDate(target, cfg.tz))}</strong>. Edit to set a new date.`;
-      setTitle(`${nm ? nm + "'s " : ''}${O.noun}`);
+      setTitle(heading);
       return;
     }
     $('clock').hidden = false;
@@ -213,7 +294,7 @@
     } else {
       let html = `Starts at 00:00 on <strong>${esc(fmtDate(target, cfg.tz))}</strong>`;
       if (crossTz) html += ` in ${esc(tzCity(cfg.tz))} <span class="nowrap">(${esc(fmtLocalTime(target))} your time)</span>`;
-      if (showAge) html += ` · ${esc(O.countPhrase(age))}`;
+      if (showAge) html += ` · ${esc(O.count.phrase(age))}`;
       $('sub').innerHTML = html;
     }
 
@@ -227,7 +308,7 @@
     const finalMinute = days === 0 && hrs === 0 && mins === 0;
     $('secCell').classList.toggle('final', finalMinute);
     $('clock').classList.toggle('last', finalMinute);
-    setTitle(`${days ? days + 'd ' : ''}${pad(hrs)}:${pad(mins)}:${pad(secs)} · ${nm ? `${nm}'s ${O.noun}` : `${O.label} countdown`}`);
+    setTitle(`${days ? days + 'd ' : ''}${pad(hrs)}:${pad(mins)}:${pad(secs)} · ${heading}`);
   }
   function setTitle(t) { if (t !== lastTitle) { document.title = t; lastTitle = t; } }
 
@@ -266,24 +347,32 @@
   }
   function applyOccLabels() {
     const O = OCCASIONS[occOf($('occIn').value)];
-    $('nameLbl').textContent = O.nameLabel; $('nameIn').placeholder = O.namePlaceholder;
-    $('dateLbl').textContent = O.dateLabel; $('ageLbl').textContent = O.countLabel;
-    $('ageIn').closest('label').hidden = O.recurs !== 'yearly';
+    $('nameLbl').textContent = O.name.label; $('nameIn').placeholder = O.name.placeholder;
+    $('dateIn').closest('label').hidden = !!O.fixed;
+    if (O.date) {
+      $('dateLbl').textContent = O.date.label;
+      const today = isoDate(new Date());
+      $('dateIn').min = O.date.when === 'future' ? today : '1900-01-01';
+      $('dateIn').max = O.date.when === 'past' ? today : '2200-12-31';
+    }
+    $('ageIn').closest('label').hidden = !O.count;
+    if (O.count) $('ageLbl').textContent = O.count.label;
   }
   function loadForm() {
     $('occIn').value = cfg.o;
     applyOccLabels();
     $('nameIn').value = cfg.sample ? '' : cfg.n;
-    $('dateIn').value = cfg.sample ? '' : cfg.d;
+    $('dateIn').value = cfg.sample || OCCASIONS[cfg.o].fixed ? '' : cfg.d;
     $('tzIn').value = cfg.tz;
     $('ageIn').checked = cfg.age;
-    $('dateIn').max = `${new Date().getFullYear() + 1}-12-31`;
   }
   function formPreview() {
-    const d = $('dateIn').value;
-    const base = validDate(d) ? { d, sample: false } : { d: sampleConfig().d, sample: true };
+    const o = occOf($('occIn').value), O = OCCASIONS[o];
     applyOccLabels();
-    cfg = { o: occOf($('occIn').value), n: $('nameIn').value.slice(0, 40), tz: $('tzIn').value || LOCAL_TZ, age: $('ageIn').checked, ...base };
+    const d = $('dateIn').value;
+    const base = O.fixed ? { d: sampleDate(O), sample: false }
+      : validDate(d) ? { d, sample: false } : { d: sampleDate(O), sample: true };
+    cfg = { o, n: $('nameIn').value.slice(0, 40), tz: $('tzIn').value || LOCAL_TZ, age: $('ageIn').checked, ...base };
     if (cfg.n.trim()) cfg.sample = false;
     celebratedFor = null;
     $('formErr').textContent = '';
@@ -292,10 +381,14 @@
   ['input', 'change'].forEach(ev => $('setup').addEventListener(ev, formPreview));
   $('setup').addEventListener('submit', e => {
     e.preventDefault();
-    const n = $('nameIn').value.trim(), d = $('dateIn').value;
-    if (!n) { $('formErr').textContent = 'Enter a name to show on the countdown.'; $('nameIn').focus(); return; }
-    if (!validDate(d)) { $('formErr').textContent = 'Pick a date of birth from the calendar.'; $('dateIn').focus(); return; }
-    cfg = { o: occOf($('occIn').value), n, d, tz: $('tzIn').value || LOCAL_TZ, age: $('ageIn').checked };
+    const o = occOf($('occIn').value), O = OCCASIONS[o];
+    const n = $('nameIn').value.trim();
+    const d = O.fixed ? sampleDate(O) : $('dateIn').value;
+    const err = (msg, el) => { $('formErr').textContent = msg; el.focus(); };
+    if (O.name.required && !n) return err(`Fill in “${O.name.label}”.`, $('nameIn'));
+    if (!validDate(d)) return err(`Pick the ${O.date.label.toLowerCase()} from the calendar.`, $('dateIn'));
+    if (O.date && O.date.when === 'future' && d < isoDate(new Date())) return err(`The ${O.date.label.toLowerCase()} has passed. Pick today or a later date.`, $('dateIn'));
+    cfg = { o, n, d, tz: $('tzIn').value || LOCAL_TZ, age: $('ageIn').checked };
     store.set('bdc.config', JSON.stringify(cfg));
     try { history.replaceState(null, '', shareUrl(cfg)); } catch {}
     mode = 'run'; celebratedFor = null; applyMode(); render();
@@ -313,7 +406,7 @@
     $('shareBox').hidden = false;
     $('copyMsg').innerHTML = '&nbsp;';
     if (navigator.share && matchMedia('(pointer: coarse)').matches) {
-      try { await navigator.share({ title: document.title, text: `Countdown to ${displayName() ? displayName() + "'s" : 'the'} ${occ().noun}`, url }); return; } catch {}
+      try { await navigator.share({ title: document.title, text: `Countdown to ${headText(occ(), displayName(), { year: nextOccurrence(Date.now()).year })}`, url }); return; } catch {}
     }
   }
   async function copy() {
