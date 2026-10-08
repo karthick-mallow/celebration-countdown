@@ -566,9 +566,11 @@
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     // Reload once when a new version takes over, so returning visitors never sit on an old build.
     const hadController = !!navigator.serviceWorker.controller;
-    let reloaded = false;
+    let reloaded = false, touched = false;
+    ['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, () => { touched = true; }, { once: true, capture: true }));
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!hadController || reloaded || document.body.classList.contains('stage')) return;
+      // Never reload under someone who is already using the page; they get the new version next visit.
+      if (!hadController || reloaded || touched || document.body.classList.contains('stage')) return;
       reloaded = true; location.reload();
     });
     addEventListener('load', () => navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
