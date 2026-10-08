@@ -1,8 +1,8 @@
-# Midnight Birthday Countdown
+# Celebration Countdown
 
 A full-screen countdown to 00:00 on someone's birthday, with confetti when it hits zero.
 
-**Live:** https://karthick-mallow.github.io/birthday-countdown/
+**Live:** https://karthick-mallow.github.io/celebration-countdown/
 
 ## Features
 - Countdown to midnight in **any time zone** (DST-safe). Viewers elsewhere see their own local time too.

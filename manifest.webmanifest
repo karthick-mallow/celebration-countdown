@@ -1,7 +1,7 @@
 {
-  "name": "Midnight Birthday Countdown",
+  "name": "Celebration Countdown",
   "short_name": "Countdown",
-  "description": "Count down to midnight on their birthday, then celebrate with confetti.",
+  "description": "Count down to midnight on the big day, then celebrate with confetti.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

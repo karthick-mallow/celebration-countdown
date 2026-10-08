@@ -1,5 +1,5 @@
 // Offline support: app shell cache-first, fonts stale-while-revalidate.
-const VERSION = 'bdc-v2';
+const VERSION = 'bdc-v3';
 const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/favicon.png', 'icons/apple-touch-icon.png'];
 
