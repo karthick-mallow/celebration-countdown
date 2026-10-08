@@ -1,0 +1,139 @@
+/* Layout: one centered night-sky stage — headline, four-cell clock, controls below.
+   Single dark theme by design (it's a midnight countdown). */
+:root {
+  --night: #0d1030;
+  --night-2: #171b46;
+  --panel: #1f2456;
+  --line: #343a78;
+  --ink: #f3f1ff;
+  --muted: #a9a8d6;
+  --gold: #ffc94a;
+  --coral: #ff7a8a;
+  --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background: radial-gradient(120% 80% at 50% 0%, var(--night-2) 0%, var(--night) 60%) fixed, var(--night);
+  color: var(--ink);
+  font: 16px/1.55 var(--font-body);
+  padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
+  padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+  -webkit-font-smoothing: antialiased;
+}
+#stars, #confetti { position: fixed; inset: 0; pointer-events: none; }
+#stars { z-index: 0; }
+#confetti { z-index: 5; }
+main {
+  position: relative; z-index: 2;
+  max-width: 880px; margin: 0 auto;
+  padding-block: clamp(28px, 6vh, 64px) 40px;
+  display: grid; gap: 32px; justify-items: center; text-align: center;
+}
+.eyebrow {
+  font: 600 12px/1 var(--font-display);
+  letter-spacing: .18em; text-transform: uppercase; color: var(--gold);
+}
+h1 {
+  font: 800 clamp(30px, 6.4vw, 60px)/1.05 var(--font-display);
+  margin: 10px 0 0; text-wrap: balance; letter-spacing: -.01em; overflow-wrap: anywhere;
+}
+h1 .name { color: var(--gold); }
+.sub { color: var(--muted); margin: 12px 0 0; font-size: 17px; text-wrap: balance; }
+.sub strong { color: var(--ink); font-weight: 500; }
+
+.clock {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(8px, 2vw, 16px); width: 100%;
+}
+.cell {
+  background: linear-gradient(180deg, var(--panel), var(--night-2));
+  border: 1px solid var(--line); border-radius: 14px;
+  padding-block: clamp(14px, 3vw, 26px) clamp(12px, 2.4vw, 20px);
+  display: grid; gap: 8px; min-width: 0;
+}
+.num {
+  font: 600 clamp(34px, 9vw, 84px)/1 var(--font-display);
+  font-variant-numeric: tabular-nums; letter-spacing: -.02em;
+}
+.unit { font: 600 11px/1 var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.cell.final .num { color: var(--coral); }
+
+/* Final minute: seconds only, centered */
+.clock.last { grid-template-columns: minmax(0, 1fr); max-width: 380px; justify-self: center; }
+.clock.last .cell:not(.final) { display: none; }
+.clock.last .num { font-size: clamp(90px, 26vw, 180px); }
+
+.celebrate h2 {
+  font: 800 clamp(34px, 8vw, 76px)/1.02 var(--font-display); margin: 0; text-wrap: balance; overflow-wrap: anywhere;
+  background: linear-gradient(90deg, var(--gold), var(--coral)); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.celebrate p { color: var(--muted); margin: 14px 0 0; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.actions.left { justify-content: flex-start; }
+button {
+  font: 600 14px/1 var(--font-body); cursor: pointer;
+  border-radius: 999px; padding: 12px 18px; border: 1px solid var(--line);
+  background: var(--panel); color: var(--ink);
+}
+button:hover { border-color: var(--gold); }
+button.primary { background: var(--gold); color: var(--night); border-color: var(--gold); }
+button.primary:hover { filter: brightness(1.06); }
+button.ghost { background: transparent; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.setup, .sharebox {
+  width: 100%; max-width: 620px; text-align: left;
+  display: grid; gap: 14px;
+}
+.setup { border-top: 1px solid var(--line); padding-top: 24px; }
+.setup h3 { font: 600 12px/1 var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fields .wide { grid-column: 1 / -1; }
+label { display: grid; gap: 6px; font-size: 13px; color: var(--muted); min-width: 0; }
+label.check { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink); cursor: pointer; }
+label.check input { width: 18px; height: 18px; accent-color: var(--gold); }
+input[type=text], input[type=date], select {
+  font: 500 16px/1.2 var(--font-body); color: var(--ink);
+  background: var(--night); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; width: 100%; min-width: 0;
+}
+.sharerow { display: flex; gap: 8px; }
+.sharerow input { flex: 1; font-size: 14px; }
+.hint { font-size: 13px; color: var(--muted); margin: 0; }
+.error { font-size: 14px; color: var(--coral); margin: 0; min-height: 1em; }
+footer { font-size: 12px; color: var(--muted); opacity: .8; max-width: 520px; }
+.noscript { position: relative; z-index: 3; text-align: center; color: var(--ink); }
+
+/* Stage mode: timer only */
+body.stage { cursor: none; }
+body.stage.awake { cursor: default; }
+body.stage main { min-height: 100vh; min-height: 100dvh; align-content: center; padding-block: 24px; max-width: 1400px; }
+body.stage header, body.stage .actions, body.stage .setup, body.stage .sharebox, body.stage footer { display: none !important; }
+body.stage .num { font-size: clamp(48px, 12vw, 200px); }
+body.stage .unit { font-size: clamp(11px, 1.3vw, 18px); }
+body.stage .cell { border-radius: clamp(10px, 1.6vw, 24px); padding-block: clamp(18px, 4vw, 48px) clamp(14px, 3vw, 36px); }
+body.stage .celebrate h2 { font-size: clamp(44px, 10vw, 160px); }
+body.stage .clock.last { max-width: min(80vw, 1000px); }
+body.stage .clock.last .num { font-size: clamp(140px, 38vw, 560px); }
+body.stage .clock.last .unit { font-size: clamp(14px, 2vw, 28px); }
+#exitStage {
+  position: fixed; z-index: 6; right: 16px; top: calc(16px + env(safe-area-inset-top, 0px));
+  opacity: 0; pointer-events: none; transition: opacity .3s;
+}
+body.stage.awake #exitStage { opacity: 1; pointer-events: auto; }
+body:not(.stage) #exitStage { display: none; }
+
+@media (max-width: 520px) {
+  .fields { grid-template-columns: 1fr; }
+  .clock { gap: 6px; }
+  .cell { border-radius: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #exitStage { transition: none; }
+}
+.nowrap { white-space: nowrap; }

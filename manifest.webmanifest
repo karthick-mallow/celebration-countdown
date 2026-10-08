@@ -1,0 +1,16 @@
+{
+  "name": "Midnight Birthday Countdown",
+  "short_name": "Countdown",
+  "description": "Count down to midnight on their birthday, then celebrate with confetti.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0d1030",
+  "theme_color": "#0d1030",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
